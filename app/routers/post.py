@@ -1,5 +1,6 @@
 from fastapi import HTTPException, status, Response, Depends, APIRouter
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 from typing import List, Optional
 
 from .. import models, schemas, oauth2
@@ -10,13 +11,17 @@ router = APIRouter(
     tags=["Posts"]
 )
 
-@router.get("/", response_model=List[schemas.Post])
+@router.get("/", response_model=List[schemas.PostReponse])
 def get_posts(db: Session = Depends(get_db), 
               current_user: any = Depends(oauth2.get_current_user), 
               params: schemas.QueryParams = Depends()):
-    posts = (db.query(models.Post)
+    posts = (db.query(models.Post, func.count(models.Vote.post_id).label("votes"))
+             .join(models.Vote, models.Vote.post_id == models.Post.id, isouter=True)
+             .group_by(models.Post.id)
              .filter(models.Post.title.contains(params.search))
              .limit(limit=params.limit).offset(offset=params.offset).all())
+    
+    posts = [{"post": post, "votes": vote} for (post, vote) in posts]
     return posts
 
 
@@ -26,17 +31,20 @@ def create_posts(post: schemas.PostCreate, db: Session = Depends(get_db), curren
     db.add(new_post)
     db.commit()
     db.refresh(new_post)
-    return new_post
+    return new_post.dict()
 
 
-@router.get("/{id}", response_model=schemas.Post)
+@router.get("/{id}", response_model=schemas.PostReponse)
 def get_post(id: int, db: Session = Depends(get_db), current_user: any = Depends(oauth2.get_current_user)):
-    post = db.query(models.Post).filter_by(id=id).first()
+    post, vote = (db.query(models.Post, func.count(models.Vote.post_id).label("votes"))
+             .join(models.Vote, models.Vote.post_id == models.Post.id, isouter=True)
+             .group_by(models.Post.id)
+             .filter(models.Post.id == id).first())
     if not post:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"post with id {id} was not found")
-    return post
+    return {"post": post, "votes": vote}
 
 
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)

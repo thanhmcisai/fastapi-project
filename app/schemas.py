@@ -1,4 +1,5 @@
 from pydantic import BaseModel, EmailStr
+from pydantic.types import conint
 from datetime import datetime
 from typing import Optional
 
@@ -14,7 +15,6 @@ class PostCreate(PostBase):
 class UserBase(BaseModel):
     email: EmailStr
     password: str
-    created_at: datetime
 class UserCreate(UserBase):
     pass
 
@@ -32,6 +32,13 @@ class Post(PostBase):
     owner: User
     class Config:
         orm_mode = True
+
+class PostReponse(BaseModel):
+    post: Post
+    votes: int
+
+    class Config:
+        orm_mode = True
 class UserLogin(BaseModel):
     email: EmailStr
     password: str
@@ -47,3 +54,7 @@ class QueryParams(BaseModel):
     limit: int = 10
     offset: int = 0
     search: Optional[str] = ""
+
+class Vote(BaseModel):
+    post_id: int
+    dir: conint(le=1)
