@@ -17,6 +17,10 @@ def get_users(db: Session = Depends(get_db), current_user: any = Depends(oauth2.
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.User)
 def create_users(user: schemas.UserCreate, db: Session = Depends(get_db)):
+
+    check_user = db.query(models.User).filter_by(email=user.email).first()
+    if check_user:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=f"Email {user.email} is existed")
     
     user.password = utils.hash(user.password)
     
@@ -49,10 +53,20 @@ def delete_user(id: int, db: Session = Depends(get_db), current_user: any = Depe
 
 @router.put("/{id}", response_model=schemas.User)
 def update_user(id: int, user: schemas.UserCreate, db: Session = Depends(get_db), current_user: any = Depends(oauth2.get_current_user)):
+    check_user = db.query(models.User).filter_by(email=user.email).first()
     user_query = db.query(models.User).filter_by(id=id)
-    if user_query.first() == None:
+    user_db = user_query.first()
+
+    if user_db == None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f"user with id: {id} does not exist")
+    
+    if check_user and check_user.id != user_db.id and check_user.email == user.email:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=f"Email {user.email} is existed")
+    
+    if user.password:
+        user.password = utils.hash(user.password)
+
     user_query.update(user.dict(), synchronize_session=False)
     db.commit()
 

@@ -4,8 +4,6 @@ from . import models, config
 from .database import engine
 from .routers import post, user, auth, vote
 
-models.Base.metadata.create_all(bind=engine)
-
 app = FastAPI()
 
 app.include_router(post.router)

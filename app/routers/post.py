@@ -31,7 +31,7 @@ def create_posts(post: schemas.PostCreate, db: Session = Depends(get_db), curren
     db.add(new_post)
     db.commit()
     db.refresh(new_post)
-    return new_post.dict()
+    return new_post
 
 
 @router.get("/{id}", response_model=schemas.PostReponse)
