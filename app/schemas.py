@@ -42,3 +42,8 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     id: Optional[int] = None
+
+class QueryParams(BaseModel):
+    limit: int = 10
+    offset: int = 0
+    search: Optional[str] = ""

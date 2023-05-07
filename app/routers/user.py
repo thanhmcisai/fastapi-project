@@ -11,7 +11,7 @@ router = APIRouter(
 )
 
 @router.get("/", response_model=List[schemas.User])
-def get_users(db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
+def get_users(db: Session = Depends(get_db), current_user: any = Depends(oauth2.get_current_user)):
     users = db.query(models.User).all()
     return users
 
@@ -27,7 +27,7 @@ def create_users(user: schemas.UserCreate, db: Session = Depends(get_db)):
     return new_user
 
 @router.get("/{id}", response_model=schemas.User)
-def get_user(id: int, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
+def get_user(id: int, db: Session = Depends(get_db), current_user: any = Depends(oauth2.get_current_user)):
     user = db.query(models.User).filter_by(id=id).first()
     if not user:
         raise HTTPException(
@@ -37,7 +37,7 @@ def get_user(id: int, db: Session = Depends(get_db), current_user: int = Depends
 
 
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_user(id: int, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
+def delete_user(id: int, db: Session = Depends(get_db), current_user: any = Depends(oauth2.get_current_user)):
     user_query = db.query(models.User).filter_by(id=id)
     if user_query.first() == None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
@@ -48,7 +48,7 @@ def delete_user(id: int, db: Session = Depends(get_db), current_user: int = Depe
 
 
 @router.put("/{id}", response_model=schemas.User)
-def update_user(id: int, user: schemas.UserCreate, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
+def update_user(id: int, user: schemas.UserCreate, db: Session = Depends(get_db), current_user: any = Depends(oauth2.get_current_user)):
     user_query = db.query(models.User).filter_by(id=id)
     if user_query.first() == None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
