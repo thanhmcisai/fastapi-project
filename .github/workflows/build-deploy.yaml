@@ -1,12 +1,4 @@
 name: Build and Deploy Code
-jobs:
-  job1:
-    runs-on: ubuntu-latest
-    steps:
-      - name: pulling git repos
-        uses: actions/checkout@v2
-      - name: say hi to CI/CD
-        run: echo "Hello CI/CD" 
 on: 
   push:
     branches:
@@ -14,3 +6,18 @@ on:
   pull_request:
     branches:
       - "main"
+jobs:
+  job1:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Pulling git repos
+        uses: actions/checkout@v2
+      - name: Install python version 3.9
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.9"
+      - name: Update pip
+        run: python -m pip install --upgrade pip
+      - name: Install all dependencies
+        run: pip install -r requirements.txt
+    
