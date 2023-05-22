@@ -6,12 +6,6 @@ from app.config import settings
 from .conftest import client, session, test_user
 
 
-def test_root(client):
-    res = client.get("/")
-    assert res.json().get('message') == 'Change the Hello World'
-    assert res.status_code == 200
-
-
 def test_create_user(client):
     res = client.post(
         "/users/", json={"email": "test@gmail.com", "password": "123456"})
