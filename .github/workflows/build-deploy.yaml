@@ -1,0 +1,16 @@
+name: Build and Deploy Code
+jobs:
+  job1:
+    runs-on: ubuntu-latest
+    steps:
+      - name: pulling git repos
+        uses: action/checkout@v2
+      - name: say hi to CI/CD
+        run: echo "Hello CI/CD" 
+on: 
+  push:
+    branches:
+      - "main"
+  pull_request:
+    branches:
+      - "main"
