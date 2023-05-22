@@ -12,8 +12,8 @@ app = FastAPI()
 origins = ["*"]
 
 app.add_middleware(
-    CORSMiddleware, 
-    allow_origins=origins, 
+    CORSMiddleware,
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"]
@@ -24,6 +24,7 @@ app.include_router(user.router)
 app.include_router(auth.router)
 app.include_router(vote.router)
 
+
 @app.get('/')
 async def root():
-    return {"message": "Change the Hello World"}
+    return {"message": "Pushing out to Ubuntu Server"}
