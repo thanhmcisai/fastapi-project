@@ -7,20 +7,21 @@ from .. import models, schemas, oauth2
 from ..database import get_db
 
 router = APIRouter(
-    prefix="/posts", 
+    prefix="/posts",
     tags=["Posts"]
 )
 
+
 @router.get("/", response_model=List[schemas.PostReponse])
-def get_posts(db: Session = Depends(get_db), 
-              current_user: any = Depends(oauth2.get_current_user), 
+def get_posts(db: Session = Depends(get_db),
+              current_user: any = Depends(oauth2.get_current_user),
               params: schemas.QueryParams = Depends()):
     posts = (db.query(models.Post, func.count(models.Vote.post_id).label("votes"))
              .join(models.Vote, models.Vote.post_id == models.Post.id, isouter=True)
              .group_by(models.Post.id)
              .filter(models.Post.title.contains(params.search))
              .limit(limit=params.limit).offset(offset=params.offset).all())
-    
+
     posts = [{"post": post, "votes": vote} for (post, vote) in posts]
     return posts
 
@@ -36,14 +37,15 @@ def create_posts(post: schemas.PostCreate, db: Session = Depends(get_db), curren
 
 @router.get("/{id}", response_model=schemas.PostReponse)
 def get_post(id: int, db: Session = Depends(get_db), current_user: any = Depends(oauth2.get_current_user)):
-    post, vote = (db.query(models.Post, func.count(models.Vote.post_id).label("votes"))
-             .join(models.Vote, models.Vote.post_id == models.Post.id, isouter=True)
-             .group_by(models.Post.id)
-             .filter(models.Post.id == id).first())
-    if not post:
+    post_query = (db.query(models.Post, func.count(models.Vote.post_id).label("votes"))
+                  .join(models.Vote, models.Vote.post_id == models.Post.id, isouter=True)
+                  .group_by(models.Post.id)
+                  .filter(models.Post.id == id).first())
+    if not post_query:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"post with id {id} was not found")
+    post, vote = post_query
     return {"post": post, "votes": vote}
 
 
@@ -53,7 +55,7 @@ def delete_post(id: int, db: Session = Depends(get_db), current_user: any = Depe
     if post_query.first() == None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f"post with id: {id} does not exist")
-    
+
     if post_query.first().owner_id != current_user.id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                             detail=f"Not authorized to perform requested action")
@@ -69,11 +71,11 @@ def update_post(id: int, post: schemas.PostCreate, db: Session = Depends(get_db)
     if post_query.first() == None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f"post with id: {id} does not exist")
-    
+
     if post_query.first().owner_id != current_user.id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                             detail=f"Not authorized to perform requested action")
-    
+
     post_query.update(post.dict(), synchronize_session=False)
     db.commit()
 
