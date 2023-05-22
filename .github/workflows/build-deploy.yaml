@@ -4,7 +4,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: pulling git repos
-        uses: action/checkout@v2
+        uses: actions/checkout@v2
       - name: say hi to CI/CD
         run: echo "Hello CI/CD" 
 on: 

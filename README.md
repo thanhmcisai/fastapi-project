@@ -74,6 +74,8 @@ WantedBy=multi-user.target
 - pytest --disable-warnings -v -s -x
 
 6. Automated CI/CD
+   '''
    Make changes to code -> Commit changes
    -> (Continous Integration) -> Pull Source Code -> Install Dependencies -> Run Automated Tests -> Build Images
    -> (Continous Delivery) -> Grab images/code -> Update Production
+   '''
