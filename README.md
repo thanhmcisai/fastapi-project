@@ -72,7 +72,7 @@ WantedBy=multi-user.target
 - `sudo snap install --classic certbot`
 - `sudo certbot --nginx`
 
-> Check change in nginx: cat /etc/nginx/sites-available/default
+> Check change in nginx: `cat /etc/nginx/sites-available/default`
 
 # Setup Firewall
 
