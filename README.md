@@ -1,13 +1,22 @@
-# fastapi-project
+# FastAPI Project Todo List
 
-1. Create new ubuntu service:
+- [x] Build APIs
+- [x] Build Server service
+- [x] Using Nginx like proxy
+- [x] Setup SSL
+- [x] Setup Firewall
+- [x] Testing
+- [x] Automated CI/CD
 
-- cd /etc/systemd/system/
-- nano fastapi.service
-  '''
-  [Unit]
-  Description=demo fastapi application
-  After=network.target
+# Create new ubuntu service
+
+- `cd /etc/systemd/system/`
+- `nano fastapi.service`
+
+```
+[Unit]
+Description=demo fastapi application
+After=network.target
 
 [Service]
 User=thanh
@@ -19,19 +28,20 @@ ExecStart=/home/thanh/app/venv/bin/gunicorn -w 4 -k uvicorn.workers.UvicornWorke
 
 [Install]
 WantedBy=multi-user.target
-'''
+```
 
-- systemctl start fastapi
-- systemctl status fastapi
-- sudo systemctl enable fastapi # Enable service
+- `systemctl start fastapi`
+- `systemctl status fastapi`
+- `sudo systemctl enable fastapi # Enable service`
 
-2. Install Nginx
+# Install Nginx
 
-- sudo apt install nginx -y
-- systemctl start nginx
-- cd /etc/nginx/sites-available
-- sudo vi default
-  '''
+- `sudo apt install nginx -y`
+- `systemctl start nginx`
+- `cd /etc/nginx/sites-available`
+- `sudo vi default`
+
+  ```
   server {
   listen 80 default_server;
   listen [::]:80 default_server;
@@ -51,31 +61,32 @@ WantedBy=multi-user.target
       }
 
   }
-  '''
+  ```
 
-- systemctl restart nginx
+- `systemctl restart nginx`
 
-3. Setup SSL using CertBot
+# Setup SSL using CertBot
 
-- Tutorial: https://certbot.eff.org/instructions?ws=nginx&os=ubuntufocal
-- sudo snap install --classic certbot
-- sudo certbot --nginx
-- Check change in nginx: cat /etc/nginx/sites-available/default
+> Tutorial: [Setup Certbot for nginx in ubuntu](https://certbot.eff.org/instructions?ws=nginx&os=ubuntufocal)
 
-4. Setup Firewall
+- `sudo snap install --classic certbot`
+- `sudo certbot --nginx`
 
-- sudo ufw status # Check status of firewall
-- sudo ufw allow <port/http/https/ssl/...> # Set port to open
-- sudo ufw enable
-- sudo ufw delete allow <port/http/https/ssl/...>
+> Check change in nginx: cat /etc/nginx/sites-available/default
 
-5. Testing
+# Setup Firewall
 
-- pytest --disable-warnings -v -s -x
+- `sudo ufw status # Check status of firewall`
+- `sudo ufw allow <port/http/https/ssl/...> # Set port to open`
+- `sudo ufw enable`
+- `sudo ufw delete allow <port/http/https/ssl/...>`
 
-6. Automated CI/CD
-   '''
-   Make changes to code -> Commit changes
-   -> (Continous Integration) -> Pull Source Code -> Install Dependencies -> Run Automated Tests -> Build Images
-   -> (Continous Delivery) -> Grab images/code -> Update Production
-   '''
+# Testing
+
+- `pytest --disable-warnings -v -s -x`
+
+# Automated CI/CD
+
+> <sub> Make changes to code -> Commit changes <br/>
+> -> (Continous Integration) -> Pull Source Code -> Install Dependencies -> Run Automated Tests -> Build Images <br/>
+> -> (Continous Delivery) -> Grab images/code -> Update Production </sub>
